@@ -1,0 +1,27 @@
+{
+    "fluentMethods": true,
+    "relationships": [],
+    "fields": [
+        {
+            "fieldName": "teamId",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "sprintId",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        }
+    ],
+    "dto": "no",
+    "service": "serviceImpl",
+    "entityTableName": "sprint_team",
+    "jpaMetamodelFiltering": false,
+    "pagination": "no",
+    "microserviceName": "IterationService",
+    "searchEngine": false
+}
