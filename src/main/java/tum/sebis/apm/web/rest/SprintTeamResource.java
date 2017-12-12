@@ -49,6 +49,7 @@ public class SprintTeamResource {
         if (sprintTeam.getId() != null) {
             throw new BadRequestAlertException("A new sprintTeam cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
         SprintTeam result = sprintTeamService.save(sprintTeam);
         return ResponseEntity.created(new URI("/api/sprint-teams/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))

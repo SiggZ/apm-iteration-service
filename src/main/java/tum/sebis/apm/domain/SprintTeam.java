@@ -1,6 +1,7 @@
 package tum.sebis.apm.domain;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import javax.validation.constraints.*;
@@ -18,12 +19,14 @@ public class SprintTeam implements Serializable {
     private String id;
 
     @NotNull
-    @Field("team_id")
-    private String teamId;
+    @DBRef
+    @Field("team")
+    private Team team;
 
     @NotNull
-    @Field("sprint_id")
-    private String sprintId;
+    @DBRef
+    @Field("sprint")
+    private Iteration sprint;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public String getId() {
@@ -34,30 +37,30 @@ public class SprintTeam implements Serializable {
         this.id = id;
     }
 
-    public String getTeamId() {
-        return teamId;
+    public Team getTeam() {
+        return team;
     }
 
-    public SprintTeam teamId(String teamId) {
-        this.teamId = teamId;
+    public SprintTeam team(Team team) {
+        this.team = team;
         return this;
     }
 
-    public void setTeamId(String teamId) {
-        this.teamId = teamId;
+    public void setTeam(Team team) {
+        this.team = team;
     }
 
-    public String getSprintId() {
-        return sprintId;
+    public Iteration getSprint() {
+        return sprint;
     }
 
-    public SprintTeam sprintId(String sprintId) {
-        this.sprintId = sprintId;
+    public SprintTeam sprintId(Iteration sprint) {
+        this.sprint = sprint;
         return this;
     }
 
-    public void setSprintId(String sprintId) {
-        this.sprintId = sprintId;
+    public void setSprint(Iteration sprint) {
+        this.sprint = sprint;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
@@ -85,8 +88,8 @@ public class SprintTeam implements Serializable {
     public String toString() {
         return "SprintTeam{" +
             "id=" + getId() +
-            ", teamId='" + getTeamId() + "'" +
-            ", sprintId='" + getSprintId() + "'" +
+            ", teamId='" + getTeam() + "'" +
+            ", sprintId='" + getSprint() + "'" +
             "}";
     }
 }
