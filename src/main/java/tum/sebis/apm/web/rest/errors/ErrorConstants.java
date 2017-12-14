@@ -4,6 +4,7 @@ import java.net.URI;
 
 public final class ErrorConstants {
 
+    // Error Types
     public static final String ERR_CONCURRENCY_FAILURE = "error.concurrencyFailure";
     public static final String ERR_VALIDATION = "error.validation";
     public static final String PROBLEM_BASE_URL = "http://www.jhipster.tech/problem";
@@ -14,6 +15,10 @@ public final class ErrorConstants {
     public static final URI EMAIL_ALREADY_USED_TYPE = URI.create(PROBLEM_BASE_URL + "/email-already-used");
     public static final URI LOGIN_ALREADY_USED_TYPE = URI.create(PROBLEM_BASE_URL + "/login-already-used");
     public static final URI EMAIL_NOT_FOUND_TYPE = URI.create(PROBLEM_BASE_URL + "/email-not-found");
+
+    // Error Messages
+    public static final String TEAM_ALREADY_IN_SPRINT_MESSAGE = "Team is already in sprint";
+    public static final String TEAM_ALREADY_EXISTS_MESSAGE = "A team with the given name already exists";
 
     private ErrorConstants() {
     }
