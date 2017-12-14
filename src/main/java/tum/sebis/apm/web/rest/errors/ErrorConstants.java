@@ -18,6 +18,7 @@ public final class ErrorConstants {
 
     // Error Messages
     public static final String TEAM_ALREADY_IN_SPRINT_MESSAGE = "Team is already in sprint";
+    public static final String TEAM_ALREADY_EXISTS_MESSAGE = "A team with the given name already exists";
 
     private ErrorConstants() {
     }

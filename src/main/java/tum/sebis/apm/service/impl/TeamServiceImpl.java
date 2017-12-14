@@ -1,11 +1,12 @@
 package tum.sebis.apm.service.impl;
 
-import tum.sebis.apm.service.TeamService;
-import tum.sebis.apm.domain.Team;
-import tum.sebis.apm.repository.TeamRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import tum.sebis.apm.domain.Team;
+import tum.sebis.apm.repository.TeamRepository;
+import tum.sebis.apm.service.TeamService;
+import tum.sebis.apm.web.rest.errors.TeamAlreadyExistsException;
 
 import java.util.List;
 
@@ -32,6 +33,11 @@ public class TeamServiceImpl implements TeamService{
     @Override
     public Team save(Team team) {
         log.debug("Request to save Team : {}", team);
+
+        if (teamRepository.findByName(team.getName()).size() > 0) {
+            throw new TeamAlreadyExistsException();
+        }
+
         return teamRepository.save(team);
     }
 
