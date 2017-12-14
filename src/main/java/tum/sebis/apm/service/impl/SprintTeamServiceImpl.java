@@ -1,11 +1,12 @@
 package tum.sebis.apm.service.impl;
 
-import tum.sebis.apm.service.SprintTeamService;
-import tum.sebis.apm.domain.SprintTeam;
-import tum.sebis.apm.repository.SprintTeamRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import tum.sebis.apm.domain.SprintTeam;
+import tum.sebis.apm.repository.SprintTeamRepository;
+import tum.sebis.apm.service.SprintTeamService;
+import tum.sebis.apm.web.rest.errors.TeamAlreadyInSprintException;
 
 import java.util.List;
 
@@ -32,6 +33,11 @@ public class SprintTeamServiceImpl implements SprintTeamService{
     @Override
     public SprintTeam save(SprintTeam sprintTeam) {
         log.debug("Request to save SprintTeam : {}", sprintTeam);
+
+        if (sprintTeamRepository.findBySprintAndTeam(sprintTeam.getSprint(), sprintTeam.getTeam()).size() > 0) {
+            throw new TeamAlreadyInSprintException();
+        }
+
         return sprintTeamRepository.save(sprintTeam);
     }
 
