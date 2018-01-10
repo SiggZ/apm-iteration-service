@@ -17,24 +17,24 @@ public interface IterationService {
     Iteration save(Iteration iteration);
 
     /**
-     *  Get all the iterations.
+     * Get all the iterations.
      *
-     *  @return the list of entities
+     * @return the list of entities
      */
     List<Iteration> findAll();
 
     /**
-     *  Get the "id" iteration.
+     * Get the "id" iteration.
      *
-     *  @param id the id of the entity
-     *  @return the entity
+     * @param id the id of the entity
+     * @return the entity
      */
     Iteration findOne(String id);
 
     /**
-     *  Delete the "id" iteration.
+     * Delete the "id" iteration.
      *
-     *  @param id the id of the entity
+     * @param id the id of the entity
      */
     void delete(String id);
 }

@@ -5,8 +5,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import javax.validation.constraints.*;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.Objects;
+
 
 /**
  * A Iteration.
@@ -15,6 +16,7 @@ import java.util.Objects;
 public class Iteration implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
     @Id
     private String id;
 
@@ -23,10 +25,10 @@ public class Iteration implements Serializable {
     private String name;
 
     @Field("start")
-    private ZonedDateTime start;
+    private LocalDate start;
 
     @Field("end")
-    private ZonedDateTime end;
+    private LocalDate end;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public String getId() {
@@ -50,29 +52,29 @@ public class Iteration implements Serializable {
         this.name = name;
     }
 
-    public ZonedDateTime getStart() {
+    public LocalDate getStart() {
         return start;
     }
 
-    public Iteration start(ZonedDateTime start) {
+    public Iteration start(LocalDate start) {
         this.start = start;
         return this;
     }
 
-    public void setStart(ZonedDateTime start) {
+    public void setStart(LocalDate start) {
         this.start = start;
     }
 
-    public ZonedDateTime getEnd() {
+    public LocalDate getEnd() {
         return end;
     }
 
-    public Iteration end(ZonedDateTime end) {
+    public Iteration end(LocalDate end) {
         this.end = end;
         return this;
     }
 
-    public void setEnd(ZonedDateTime end) {
+    public void setEnd(LocalDate end) {
         this.end = end;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove

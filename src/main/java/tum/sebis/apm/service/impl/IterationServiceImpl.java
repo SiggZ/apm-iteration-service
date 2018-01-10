@@ -36,9 +36,9 @@ public class IterationServiceImpl implements IterationService{
     }
 
     /**
-     *  Get all the iterations.
+     * Get all the iterations.
      *
-     *  @return the list of entities
+     * @return the list of entities
      */
     @Override
     public List<Iteration> findAll() {
@@ -47,10 +47,10 @@ public class IterationServiceImpl implements IterationService{
     }
 
     /**
-     *  Get one iteration by id.
+     * Get one iteration by id.
      *
-     *  @param id the id of the entity
-     *  @return the entity
+     * @param id the id of the entity
+     * @return the entity
      */
     @Override
     public Iteration findOne(String id) {
@@ -59,9 +59,9 @@ public class IterationServiceImpl implements IterationService{
     }
 
     /**
-     *  Delete the  iteration by id.
+     * Delete the iteration by id.
      *
-     *  @param id the id of the entity
+     * @param id the id of the entity
      */
     @Override
     public void delete(String id) {
