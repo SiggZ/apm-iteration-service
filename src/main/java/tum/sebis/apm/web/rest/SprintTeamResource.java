@@ -72,6 +72,7 @@ public class SprintTeamResource {
         if (sprintTeam.getId() == null) {
             return createSprintTeam(sprintTeam);
         }
+
         SprintTeam result = sprintTeamService.save(sprintTeam);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, sprintTeam.getId().toString()))

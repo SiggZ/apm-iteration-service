@@ -5,8 +5,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tum.sebis.apm.domain.SprintTeam;
 import tum.sebis.apm.repository.SprintTeamRepository;
+import tum.sebis.apm.service.IterationService;
 import tum.sebis.apm.service.SprintTeamService;
+import tum.sebis.apm.service.TeamService;
+import tum.sebis.apm.web.rest.errors.IterationNotFoundException;
+import tum.sebis.apm.web.rest.errors.SprintTeamNotFoundException;
 import tum.sebis.apm.web.rest.errors.TeamAlreadyInSprintException;
+import tum.sebis.apm.web.rest.errors.TeamNotFoundException;
 
 import java.util.List;
 
@@ -19,9 +24,13 @@ public class SprintTeamServiceImpl implements SprintTeamService{
     private final Logger log = LoggerFactory.getLogger(SprintTeamServiceImpl.class);
 
     private final SprintTeamRepository sprintTeamRepository;
+    private final IterationService iterationService;
+    private final TeamService teamService;
 
-    public SprintTeamServiceImpl(SprintTeamRepository sprintTeamRepository) {
+    public SprintTeamServiceImpl(SprintTeamRepository sprintTeamRepository, IterationService iterationService, TeamService teamService) {
         this.sprintTeamRepository = sprintTeamRepository;
+        this.iterationService = iterationService;
+        this.teamService = teamService;
     }
 
     /**
@@ -37,8 +46,19 @@ public class SprintTeamServiceImpl implements SprintTeamService{
         if (sprintTeamRepository.findBySprintAndTeam(sprintTeam.getSprint(), sprintTeam.getTeam()).size() > 0) {
             throw new TeamAlreadyInSprintException();
         }
+        if (iterationService.findOne(sprintTeam.getSprint().getId()) == null) {
+            throw new IterationNotFoundException();
+        }
+        if (teamService.findOne(sprintTeam.getTeam().getId()) == null) {
+            throw new TeamNotFoundException();
+        }
 
-        return sprintTeamRepository.save(sprintTeam);
+        SprintTeam responseSprintTeam = sprintTeamRepository.save(sprintTeam);
+        // Since the fields of the referenced entities (iteration and team) are not filled correctly by the repository
+        // we have to retrieve and assign them manually here.
+        responseSprintTeam.setSprint(iterationService.findOne(responseSprintTeam.getSprint().getId()));
+        responseSprintTeam.setTeam(teamService.findOne(responseSprintTeam.getTeam().getId()));
+        return responseSprintTeam;
     }
 
     /**
@@ -72,6 +92,11 @@ public class SprintTeamServiceImpl implements SprintTeamService{
     @Override
     public void delete(String id) {
         log.debug("Request to delete SprintTeam : {}", id);
+
+        if (sprintTeamRepository.findOne(id) == null) {
+            throw new SprintTeamNotFoundException();
+        }
+
         sprintTeamRepository.delete(id);
     }
 }
