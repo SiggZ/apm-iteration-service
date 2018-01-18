@@ -3,15 +3,17 @@ package tum.sebis.apm.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import tum.sebis.apm.domain.Iteration;
 import tum.sebis.apm.domain.Person;
 import tum.sebis.apm.domain.SprintTeam;
+import tum.sebis.apm.domain.Team;
 import tum.sebis.apm.repository.SprintTeamRepository;
 import tum.sebis.apm.service.IterationService;
 import tum.sebis.apm.service.SprintTeamService;
 import tum.sebis.apm.service.TeamService;
-import tum.sebis.apm.web.rest.errors.IterationNotFoundException;
+import tum.sebis.apm.web.rest.errors.IdMustNotBeNullException;
+import tum.sebis.apm.web.rest.errors.SprintNotFoundException;
 import tum.sebis.apm.web.rest.errors.SprintTeamNotFoundException;
-import tum.sebis.apm.web.rest.errors.TeamAlreadyInSprintException;
 import tum.sebis.apm.web.rest.errors.TeamNotFoundException;
 
 import java.time.DayOfWeek;
@@ -49,25 +51,40 @@ public class SprintTeamServiceImpl implements SprintTeamService{
     public SprintTeam save(SprintTeam sprintTeam) {
         log.debug("Request to save SprintTeam : {}", sprintTeam);
 
-        // TODO: adjust this validation
+        // TODO: adjust this validation?
 //        if (sprintTeamRepository.findBySprintAndTeam(sprintTeam.getSprint(), sprintTeam.getTeam()).size() > 0) {
 //            throw new TeamAlreadyInSprintException();
 //        }
-        if (iterationService.findOne(sprintTeam.getSprint().getId()) == null) {
-            throw new IterationNotFoundException();
+        String sprintId = sprintTeam.getSprint().getId();
+        if (sprintId == null || sprintId.isEmpty()) {
+            throw new IdMustNotBeNullException("Sprint");
         }
-        if (teamService.findOne(sprintTeam.getTeam().getId()) == null) {
+        String teamId = sprintTeam.getTeam().getId();
+        if (teamId == null || teamId.isEmpty()) {
+            throw new IdMustNotBeNullException("Team");
+        }
+        Iteration sprint = iterationService.findOne(sprintId);
+        if (sprint == null) {
+            throw new SprintNotFoundException();
+        }
+        Team team = teamService.findOne(teamId);
+        if (team == null) {
             throw new TeamNotFoundException();
         }
         // TODO: validation for persons? error if persons do not exist?
 
-        sprintTeam = calculateAvailableDays(sprintTeam);
+        // Since the fields of the referenced entities (sprint and team) are not filled correctly by the repository
+        // we have to retrieve and assign them manually here.
+        sprintTeam.setSprint(sprint);
+        sprintTeam.setTeam(team);
+
+        if (sprintTeam.getPersons() == null) {
+            sprintTeam.setPersons(new ArrayList<>());
+        } else {
+            sprintTeam = calculateAvailableDays(sprintTeam);
+        }
 
         SprintTeam responseSprintTeam = sprintTeamRepository.save(sprintTeam);
-        // Since the fields of the referenced entities (iteration and team) are not filled correctly by the repository
-        // we have to retrieve and assign them manually here.
-        responseSprintTeam.setSprint(iterationService.findOne(responseSprintTeam.getSprint().getId()));
-        responseSprintTeam.setTeam(teamService.findOne(responseSprintTeam.getTeam().getId()));
         return responseSprintTeam;
     }
 
