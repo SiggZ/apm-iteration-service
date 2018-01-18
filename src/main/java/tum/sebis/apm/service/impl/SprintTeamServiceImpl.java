@@ -3,6 +3,7 @@ package tum.sebis.apm.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import tum.sebis.apm.domain.Person;
 import tum.sebis.apm.domain.SprintTeam;
 import tum.sebis.apm.repository.SprintTeamRepository;
 import tum.sebis.apm.service.IterationService;
@@ -13,7 +14,12 @@ import tum.sebis.apm.web.rest.errors.SprintTeamNotFoundException;
 import tum.sebis.apm.web.rest.errors.TeamAlreadyInSprintException;
 import tum.sebis.apm.web.rest.errors.TeamNotFoundException;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Service Implementation for managing SprintTeam.
@@ -43,15 +49,19 @@ public class SprintTeamServiceImpl implements SprintTeamService{
     public SprintTeam save(SprintTeam sprintTeam) {
         log.debug("Request to save SprintTeam : {}", sprintTeam);
 
-        if (sprintTeamRepository.findBySprintAndTeam(sprintTeam.getSprint(), sprintTeam.getTeam()).size() > 0) {
-            throw new TeamAlreadyInSprintException();
-        }
+        // TODO: adjust this validation
+//        if (sprintTeamRepository.findBySprintAndTeam(sprintTeam.getSprint(), sprintTeam.getTeam()).size() > 0) {
+//            throw new TeamAlreadyInSprintException();
+//        }
         if (iterationService.findOne(sprintTeam.getSprint().getId()) == null) {
             throw new IterationNotFoundException();
         }
         if (teamService.findOne(sprintTeam.getTeam().getId()) == null) {
             throw new TeamNotFoundException();
         }
+        // TODO: validation for persons? error if persons do not exist?
+
+        sprintTeam = calculateAvailableDays(sprintTeam);
 
         SprintTeam responseSprintTeam = sprintTeamRepository.save(sprintTeam);
         // Since the fields of the referenced entities (iteration and team) are not filled correctly by the repository
@@ -98,5 +108,40 @@ public class SprintTeamServiceImpl implements SprintTeamService{
         }
 
         sprintTeamRepository.delete(id);
+    }
+
+    /**
+     *  Calculate the days that the persons of the sprint team are available in the corresponding sprint
+     *
+     *  @param sprintTeam
+     *  @return the sprintTeam entity with the calculated availabilities
+     */
+    private SprintTeam calculateAvailableDays(SprintTeam sprintTeam) {
+        LocalDate startDate = sprintTeam.getSprint().getStart();
+        LocalDate endDate = sprintTeam.getSprint().getEnd();
+
+        for (Person person : sprintTeam.getPersons()) {
+            person.setAvailableDays(getListOfWeekdays(startDate, endDate));
+        }
+        return sprintTeam;
+    }
+
+    /**
+     *  Generate a list of LocalDate between given startDate and endDate without weekends
+     *
+     * @param startDate
+     * @param endDate
+     * @return a list of LocalDate without weekends
+     */
+    private List<LocalDate> getListOfWeekdays(LocalDate startDate, LocalDate endDate) {
+        List<LocalDate> listOfDays = new ArrayList<>();
+        Set<DayOfWeek> weekend = EnumSet.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
+
+        for (LocalDate d = startDate; !d.isAfter(endDate); d = d.plusDays(1)) {
+            if (!weekend.contains(d.getDayOfWeek())) {
+                listOfDays.add(d);
+            }
+        }
+        return listOfDays;
     }
 }

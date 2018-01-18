@@ -4,8 +4,10 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-import javax.validation.constraints.*;
+
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -27,6 +29,9 @@ public class SprintTeam implements Serializable {
     @DBRef
     @Field("sprint")
     private Iteration sprint;
+
+    @Field("persons")
+    private List<Person> persons;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public String getId() {
@@ -54,7 +59,7 @@ public class SprintTeam implements Serializable {
         return sprint;
     }
 
-    public SprintTeam sprintId(Iteration sprint) {
+    public SprintTeam sprint(Iteration sprint) {
         this.sprint = sprint;
         return this;
     }
@@ -63,6 +68,15 @@ public class SprintTeam implements Serializable {
         this.sprint = sprint;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
+
+
+    public List<Person> getPersons() {
+        return persons;
+    }
+
+    public void setPersons(List<Person> persons) {
+        this.persons = persons;
+    }
 
     @Override
     public boolean equals(Object o) {
