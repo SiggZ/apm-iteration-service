@@ -117,11 +117,12 @@ public class SprintTeamResource {
     /**
      * GET  /sprint-teams-by-sprint : get all the sprint teams for a particular sprint.
      */
-    @GetMapping("/sprint-teams-by-sprint/{sprintId}")
+    @GetMapping("/sprint-teams-by-sprint/{id}")
     @Timed
-    public List<SprintTeam> getSprintTeamsBySprint(@PathVariable String sprintId) {
+    public List<SprintTeam> getSprintTeamsBySprint(@PathVariable String id) {
         // Get the sprint for the corresponding ID
-        Iteration sprint = iterationService.findOne(sprintId);
+        Iteration sprint = iterationService.findOne(id);
+        log.debug("REST request to get Sprint Teams by Sprint: {}", id);
         List<SprintTeam> sprintTeams = sprintTeamRepository.findBySprint(sprint);
         return sprintTeams;
     }
