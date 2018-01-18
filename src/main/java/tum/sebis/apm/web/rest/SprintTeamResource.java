@@ -1,8 +1,12 @@
 package tum.sebis.apm.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+
+import tum.sebis.apm.domain.Iteration;
 import tum.sebis.apm.domain.SprintTeam;
 import tum.sebis.apm.service.SprintTeamService;
+import tum.sebis.apm.service.IterationService;
+import tum.sebis.apm.repository.SprintTeamRepository;
 import tum.sebis.apm.web.rest.errors.BadRequestAlertException;
 import tum.sebis.apm.web.rest.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
@@ -31,8 +35,14 @@ public class SprintTeamResource {
 
     private final SprintTeamService sprintTeamService;
 
-    public SprintTeamResource(SprintTeamService sprintTeamService) {
+    private final IterationService iterationService;
+
+    private final SprintTeamRepository sprintTeamRepository;
+
+    public SprintTeamResource(SprintTeamService sprintTeamService, IterationService iterationService, SprintTeamRepository sprintTeamRepository ) {
         this.sprintTeamService = sprintTeamService;
+        this.iterationService = iterationService;
+        this.sprintTeamRepository = sprintTeamRepository;
     }
 
     /**
@@ -102,6 +112,18 @@ public class SprintTeamResource {
         log.debug("REST request to get SprintTeam : {}", id);
         SprintTeam sprintTeam = sprintTeamService.findOne(id);
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(sprintTeam));
+    }
+
+    /**
+     * GET  /sprint-teams-by-sprint : get all the sprint teams for a particular sprint.
+     */
+    @GetMapping("/sprint-teams-by-sprint/{sprintId}")
+    @Timed
+    public List<SprintTeam> getSprintTeamsBySprint(@PathVariable String sprintId) {
+        // Get the sprint for the corresponding ID
+        Iteration sprint = iterationService.findOne(sprintId);
+        List<SprintTeam> sprintTeams = sprintTeamRepository.findBySprint(sprint);
+        return sprintTeams;
     }
 
     /**
