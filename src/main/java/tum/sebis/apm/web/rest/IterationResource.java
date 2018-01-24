@@ -71,6 +71,8 @@ public class IterationResource {
         if (iteration.getId() == null) {
             return createIteration(iteration);
         }
+        // TODO: we have to update/recalculate the available days of the members of all sprint teams belonging to the updated sprint,
+        // if there are any (and if the dates changed)
         Iteration result = iterationService.save(iteration);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, iteration.getId().toString()))

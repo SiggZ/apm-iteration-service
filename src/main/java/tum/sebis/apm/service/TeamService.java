@@ -8,33 +8,36 @@ import java.util.List;
  */
 public interface TeamService {
 
-    /**
-     * Save a team.
-     *
-     * @param team the entity to save
-     * @return the persisted entity
-     */
-    Team save(Team team);
+	/**
+	 * Save a team.
+	 *
+	 * @param team
+	 *            the entity to save
+	 * @return the persisted entity
+	 */
+	Team save(Team team);
 
-    /**
-     *  Get all the teams.
-     *
-     *  @return the list of entities
-     */
-    List<Team> findAll();
+	/**
+	 * Get all the teams.
+	 *
+	 * @return the list of entities
+	 */
+	List<Team> findAll();
 
-    /**
-     *  Get the "id" team.
-     *
-     *  @param id the id of the entity
-     *  @return the entity
-     */
-    Team findOne(String id);
+	/**
+	 * Get the "id" team.
+	 *
+	 * @param id
+	 *            the id of the entity
+	 * @return the entity
+	 */
+	Team findOne(String id);
 
-    /**
-     *  Delete the "id" team.
-     *
-     *  @param id the id of the entity
-     */
-    void delete(String id);
+	/**
+	 * Delete the "id" team.
+	 *
+	 * @param id
+	 *            the id of the entity
+	 */
+	void delete(String id);
 }

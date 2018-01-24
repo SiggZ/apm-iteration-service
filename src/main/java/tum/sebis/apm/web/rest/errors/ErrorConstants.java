@@ -22,6 +22,8 @@ public final class ErrorConstants {
     public static final String SPRINT_NOT_FOUND_MESSAGE = "A sprint with the given id could not be found";
     public static final String TEAM_NOT_FOUND_MESSAGE = "A team with the given id could not be found";
     public static final String SPRINT_TEAM_NOT_FOUND_MESSAGE = "A sprint team with the given id could not be found";
+    public static final String PERSON_NOT_FOUND_MESSAGE = "A person with the given id could not be found";
+    public static final String ID_MUST_NOT_BE_NULL_MESSAGE = "id must not be null";
 
     private ErrorConstants() {
     }
