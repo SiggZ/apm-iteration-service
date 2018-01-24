@@ -3,9 +3,10 @@ package tum.sebis.apm.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import tum.sebis.apm.client.PersonServiceClient;
 import tum.sebis.apm.domain.Iteration;
-import tum.sebis.apm.domain.Person;
 import tum.sebis.apm.domain.SprintTeam;
+import tum.sebis.apm.domain.SprintTeamPerson;
 import tum.sebis.apm.domain.Team;
 import tum.sebis.apm.repository.SprintTeamRepository;
 import tum.sebis.apm.service.IterationService;
@@ -15,6 +16,7 @@ import tum.sebis.apm.web.rest.errors.IdMustNotBeNullException;
 import tum.sebis.apm.web.rest.errors.SprintNotFoundException;
 import tum.sebis.apm.web.rest.errors.SprintTeamNotFoundException;
 import tum.sebis.apm.web.rest.errors.TeamNotFoundException;
+import tum.sebis.apm.web.rest.errors.PersonNotFoundException;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -22,6 +24,8 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Service Implementation for managing SprintTeam.
@@ -34,11 +38,13 @@ public class SprintTeamServiceImpl implements SprintTeamService{
     private final SprintTeamRepository sprintTeamRepository;
     private final IterationService iterationService;
     private final TeamService teamService;
+    private final PersonServiceClient personServiceClient;
 
-    public SprintTeamServiceImpl(SprintTeamRepository sprintTeamRepository, IterationService iterationService, TeamService teamService) {
+    public SprintTeamServiceImpl(SprintTeamRepository sprintTeamRepository, IterationService iterationService, TeamService teamService, PersonServiceClient personServiceClient) {
         this.sprintTeamRepository = sprintTeamRepository;
         this.iterationService = iterationService;
         this.teamService = teamService;
+        this.personServiceClient = personServiceClient;
     }
 
     /**
@@ -71,21 +77,32 @@ public class SprintTeamServiceImpl implements SprintTeamService{
         if (team == null) {
             throw new TeamNotFoundException();
         }
-        // TODO: validation for persons? error if persons do not exist?
 
         // Since the fields of the referenced entities (sprint and team) are not filled correctly by the repository
-        // we have to retrieve and assign them manually here.
+        // we have to retrieve and assign them manually here. (Before(!) calculating the available days below)
         sprintTeam.setSprint(sprint);
         sprintTeam.setTeam(team);
 
-        if (sprintTeam.getPersons() == null) {
-            sprintTeam.setPersons(new ArrayList<>());
+        if (sprintTeam.getSprintTeamPersons() == null) {
+            sprintTeam.setSprintTeamPersons(new ArrayList<>());
         } else {
+            sprintTeam.setSprintTeamPersons(removeDuplicates(sprintTeam.getSprintTeamPersons()));
+            checkSprintTeamMembers(sprintTeam.getSprintTeamPersons());
             sprintTeam = calculateAvailableDays(sprintTeam);
         }
 
         SprintTeam responseSprintTeam = sprintTeamRepository.save(sprintTeam);
         return responseSprintTeam;
+    }
+
+    private List<SprintTeamPerson> removeDuplicates(List<SprintTeamPerson> members) {
+        Map<String,SprintTeamPerson> map = new HashMap<>();
+        for (SprintTeamPerson member : members) {
+            map.put(member.getPersonId(), member);
+        }
+        members.clear();
+        members.addAll(map.values());
+        return members;
     }
 
     /**
@@ -128,6 +145,22 @@ public class SprintTeamServiceImpl implements SprintTeamService{
     }
 
     /**
+     *  Check, if the members specified in a sprint team exist by querying
+     *  the person service client with the person ids.
+     *  If one of the person ids does not belong to an existing person, a {@link PersonNotFoundException}
+     *  is thrown.
+     * @param members a list of SprintTeamPersons
+     */
+    private void checkSprintTeamMembers(List<SprintTeamPerson> members) {
+        for (SprintTeamPerson member : members) {
+            if (member.getPersonId() == null || !personServiceClient.isPersonExisting(member.getPersonId())) {
+                //TODO: maybe just ignore member entries with non-existing person ids instead of throwing an exception?
+                throw new PersonNotFoundException(member.getPersonId());
+            }
+        }
+    }
+
+    /**
      *  Calculate the days that the persons of the sprint team are available in the corresponding sprint
      *
      *  @param sprintTeam
@@ -137,8 +170,8 @@ public class SprintTeamServiceImpl implements SprintTeamService{
         LocalDate startDate = sprintTeam.getSprint().getStart();
         LocalDate endDate = sprintTeam.getSprint().getEnd();
 
-        for (Person person : sprintTeam.getPersons()) {
-            person.setAvailableDays(getListOfWeekdays(startDate, endDate));
+        for (SprintTeamPerson sprintTeamPerson : sprintTeam.getSprintTeamPersons()) {
+            sprintTeamPerson.setAvailableDays(getListOfWeekdays(startDate, endDate));
         }
         return sprintTeam;
     }

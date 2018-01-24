@@ -30,8 +30,8 @@ public class SprintTeam implements Serializable {
     @Field("sprint")
     private Iteration sprint;
 
-    @Field("persons")
-    private List<Person> persons;
+    @Field("sprintTeamPersons")
+    private List<SprintTeamPerson> sprintTeamPersons;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public String getId() {
@@ -70,12 +70,12 @@ public class SprintTeam implements Serializable {
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
 
-    public List<Person> getPersons() {
-        return persons;
+    public List<SprintTeamPerson> getSprintTeamPersons() {
+        return sprintTeamPersons;
     }
 
-    public void setPersons(List<Person> persons) {
-        this.persons = persons;
+    public void setSprintTeamPersons(List<SprintTeamPerson> sprintTeamPersons) {
+        this.sprintTeamPersons = sprintTeamPersons;
     }
 
     @Override
