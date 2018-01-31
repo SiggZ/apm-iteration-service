@@ -1,5 +1,7 @@
 package tum.sebis.apm.domain;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -10,6 +12,8 @@ import java.util.Objects;
 /**
  * A Team.
  */
+@Getter
+@Setter
 @Document(collection = "team")
 public class Team implements Serializable {
 
@@ -22,25 +26,9 @@ public class Team implements Serializable {
     private String name;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
     public Team name(String name) {
         this.name = name;
         return this;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
