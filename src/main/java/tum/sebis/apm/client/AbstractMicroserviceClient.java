@@ -8,7 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestOperations;
 import tum.sebis.apm.security.SecurityUtils;
 
@@ -63,6 +63,16 @@ public abstract class AbstractMicroserviceClient<E> {
         return generateUrl(path + "/" + id);
     }
 
+    /**
+     *  Send an authorized request to the given URL. For authorization the current JWT from the security context
+     *  is used.
+     *
+     * @param url the URL to send the request to
+     * @param method the HTTP method to use
+     * @param requestBody the request body to send
+     * @param responseType the type of the data in the response body
+     * @return a response entity containing the response from the service and/or the according status code
+     */
     protected ResponseEntity<E> sendAuthorizedRequest(String url, HttpMethod method, E requestBody, Class<E> responseType) {
         HttpHeaders headers = new HttpHeaders();
         String jwt = SecurityUtils.getCurrentUserJWT();
@@ -70,8 +80,8 @@ public abstract class AbstractMicroserviceClient<E> {
         HttpEntity<E> requestEntity = new HttpEntity<>(requestBody, headers);
         ResponseEntity<E> response;
         try {
-             response = restTemplate.exchange(URI.create(url), method, requestEntity, responseType);
-        } catch (HttpStatusCodeException e) {
+            response = restTemplate.exchange(URI.create(url), method, requestEntity, responseType);
+        } catch (HttpClientErrorException e) {
             response = ResponseEntity.status(e.getStatusCode()).build();
         }
         return response;
