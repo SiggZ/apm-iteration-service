@@ -116,7 +116,7 @@ public class SprintTeamResource {
     }
 
     /**
-     * GET  /sprint-teams-by-sprint : get all the sprint teams for a particular sprint.
+     * GET  /sprint-teams-by-sprint/:id : get all the sprint teams for a particular sprint.
      */
     @GetMapping("/sprint-teams-by-sprint/{id}")
     @Timed
@@ -140,5 +140,19 @@ public class SprintTeamResource {
         log.debug("REST request to delete SprintTeam : {}", id);
         sprintTeamService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id)).build();
+    }
+
+    /**
+     * GET  /sprint-teams/:id/capacity : gets the capacity for sprintTeam with given id.
+     *
+     * @param id the id of the sprintTeam to retrieve the capacity for
+     * @return the ResponseEntity with status 200 (OK) and the capacity in the body, or with status 404 (Not Found)
+     */
+    @GetMapping("/sprint-teams/{id}/capacity")
+    @Timed
+    public ResponseEntity<Double> getSprintTeamCapacity(@PathVariable String id) {
+        log.debug("REST request to get capacity for SprintTeam : {}", id);
+        double capacity = sprintTeamService.calculateCapacity(id);
+        return ResponseEntity.ok(capacity);
     }
 }

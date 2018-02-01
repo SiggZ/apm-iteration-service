@@ -49,15 +49,6 @@ public class SprintTeam implements Serializable {
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
 
-
-    public List<SprintTeamPerson> getSprintTeamPersons() {
-        return sprintTeamPersons;
-    }
-
-    public void setSprintTeamPersons(List<SprintTeamPerson> sprintTeamPersons) {
-        this.sprintTeamPersons = sprintTeamPersons;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {

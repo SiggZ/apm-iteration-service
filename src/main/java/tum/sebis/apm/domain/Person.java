@@ -22,5 +22,7 @@ public class Person {
 
     private Double projectAvailability;
 
+    private Double sprintAvailability;
+
     private Double ahcr;
 }

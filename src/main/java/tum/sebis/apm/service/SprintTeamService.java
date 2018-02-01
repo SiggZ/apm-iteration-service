@@ -1,6 +1,7 @@
 package tum.sebis.apm.service;
 
 import tum.sebis.apm.domain.SprintTeam;
+
 import java.util.List;
 
 /**
@@ -37,4 +38,12 @@ public interface SprintTeamService {
      *  @param id the id of the entity
      */
     void delete(String id);
+
+    /**
+     *  Calculate the capacity for the SprintTeam with the given id
+     *
+     * @param sprintTeamId the id of the sprint team for which to calculate the capacity
+     * @return the calculated capacity
+     */
+    double calculateCapacity(String sprintTeamId);
 }

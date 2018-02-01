@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import tum.sebis.apm.client.PersonServiceClient;
 import tum.sebis.apm.domain.Iteration;
+import tum.sebis.apm.domain.Person;
 import tum.sebis.apm.domain.SprintTeam;
 import tum.sebis.apm.domain.SprintTeamPerson;
 import tum.sebis.apm.domain.Team;
@@ -95,16 +96,6 @@ public class SprintTeamServiceImpl implements SprintTeamService{
         return responseSprintTeam;
     }
 
-    private List<SprintTeamPerson> removeDuplicates(List<SprintTeamPerson> members) {
-        Map<String,SprintTeamPerson> map = new HashMap<>();
-        for (SprintTeamPerson member : members) {
-            map.put(member.getPersonId(), member);
-        }
-        members.clear();
-        members.addAll(map.values());
-        return members;
-    }
-
     /**
      *  Get all the sprintTeams.
      *
@@ -125,7 +116,11 @@ public class SprintTeamServiceImpl implements SprintTeamService{
     @Override
     public SprintTeam findOne(String id) {
         log.debug("Request to get SprintTeam : {}", id);
-        return sprintTeamRepository.findOne(id);
+        SprintTeam sprintTeam = sprintTeamRepository.findOne(id);
+        if (sprintTeam == null) {
+            throw new SprintTeamNotFoundException();
+        }
+        return sprintTeam;
     }
 
     /**
@@ -136,12 +131,46 @@ public class SprintTeamServiceImpl implements SprintTeamService{
     @Override
     public void delete(String id) {
         log.debug("Request to delete SprintTeam : {}", id);
-
-        if (sprintTeamRepository.findOne(id) == null) {
-            throw new SprintTeamNotFoundException();
+        if (findOne(id) != null) {
+            sprintTeamRepository.delete(id);
         }
+    }
 
-        sprintTeamRepository.delete(id);
+    /**
+     *  Calculate the capacity for the SprintTeam with the given id
+     *
+     * @param sprintTeamId the id of the sprint team for which to calculate the capacity
+     * @return the calculated capacity
+     */
+    @Override
+    public double calculateCapacity(String sprintTeamId) {
+        log.debug("Request to calculate capacity for SprintTeam : {}", sprintTeamId);
+        double capacity = 0;
+        List<SprintTeamPerson> sprintTeamPersons = findOne(sprintTeamId).getSprintTeamPersons();
+        if (sprintTeamPersons != null) {
+            for (SprintTeamPerson sprintTeamPerson : sprintTeamPersons) {
+                Person person = personServiceClient.getPersonById(sprintTeamPerson.getPersonId());
+                capacity +=
+                    sprintTeamPerson.getAvailableDays().size() * person.getProjectAvailability() * person.getSprintAvailability();
+            }
+        }
+        return capacity;
+    }
+
+    /**
+     *  Removes duplicate entries from a list of SprintTeamPersons.
+     *
+     * @param members the list of SprintTeamPersons
+     * @return the list of SprintTeamPersons without duplicates
+     */
+    private List<SprintTeamPerson> removeDuplicates(List<SprintTeamPerson> members) {
+        Map<String,SprintTeamPerson> map = new HashMap<>();
+        for (SprintTeamPerson member : members) {
+            map.put(member.getPersonId(), member);
+        }
+        members.clear();
+        members.addAll(map.values());
+        return members;
     }
 
     /**

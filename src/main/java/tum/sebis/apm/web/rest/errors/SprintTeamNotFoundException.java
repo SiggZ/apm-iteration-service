@@ -7,6 +7,6 @@ public class SprintTeamNotFoundException extends AbstractThrowableProblem {
 
     public SprintTeamNotFoundException() {
         super(null, Status.NOT_FOUND.getReasonPhrase(), Status.NOT_FOUND,
-            ErrorConstants.TEAM_NOT_FOUND_MESSAGE);
+            ErrorConstants.SPRINT_TEAM_NOT_FOUND_MESSAGE);
     }
 }
