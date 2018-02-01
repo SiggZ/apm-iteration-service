@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestOperations;
 import tum.sebis.apm.domain.Person;
+import tum.sebis.apm.web.rest.errors.PersonNotFoundException;
 import tum.sebis.apm.web.rest.errors.PersonServiceException;
 
 @Component
@@ -19,12 +20,12 @@ public class PersonServiceClient extends AbstractMicroserviceClient<Person> {
     }
 
     public boolean isPersonExisting(String id) {
-        if (id == null || id.isEmpty()){
+        try {
+            Person person = getPersonById(id);
+            return person != null;
+        } catch (IllegalArgumentException|PersonNotFoundException e) {
             return false;
         }
-        ResponseEntity<Person> response =
-            sendAuthorizedRequest(generateUrl("people", id), HttpMethod.GET, null, Person.class);
-        return response.getStatusCode().equals(HttpStatus.OK) && response.getBody() != null;
     }
 
     public Person getPersonById(String id) {
@@ -36,7 +37,10 @@ public class PersonServiceClient extends AbstractMicroserviceClient<Person> {
         if (response.getStatusCode().equals(HttpStatus.OK) && response.getBody() != null) {
             return response.getBody();
         }
+        if (response.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+            throw new PersonNotFoundException(id);
+        }
         throw new PersonServiceException("Request for retrieving a person failed with status "
-            + response.getStatusCode() + " (" +response.getStatusCode().getReasonPhrase() + ")");
+            + response.getStatusCode() + " (" + response.getStatusCode().getReasonPhrase() + ")");
     }
 }
