@@ -34,7 +34,10 @@ public class SprintTeam implements Serializable {
     @Field("sprint")
     private Iteration sprint;
 
-    @Field("sprintTeamPersons")
+    @Field("velocity-factor")
+    private double velocityFactor;
+
+    @Field("sprint-team-persons")
     private List<SprintTeamPerson> sprintTeamPersons;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove

@@ -155,4 +155,18 @@ public class SprintTeamResource {
         double capacity = sprintTeamService.calculateCapacity(id);
         return ResponseEntity.ok(capacity);
     }
+
+    /**
+     * GET  /sprint-teams/:id/velocity : gets the velocity for sprintTeam with given id.
+     *
+     * @param id the id of the sprintTeam to retrieve the velocity for
+     * @return the ResponseEntity with status 200 (OK) and the velocity in the body, or with status 404 (Not Found)
+     */
+    @GetMapping("/sprint-teams/{id}/velocity")
+    @Timed
+    public ResponseEntity<Double> getSprintTeamVelocity(@PathVariable String id) {
+        log.debug("REST request to get velocity for SprintTeam : {}", id);
+        double velocity = sprintTeamService.calculateVelocity(id);
+        return ResponseEntity.ok(velocity);
+    }
 }

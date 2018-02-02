@@ -156,6 +156,17 @@ public class SprintTeamServiceImpl implements SprintTeamService{
     }
 
     /**
+     *  Calculate the velocity for the SprintTeam with the given id
+     *
+     * @param sprintTeamId the id of the sprint team for which to calculate the velocity
+     * @return the calculated velocity
+     */
+    @Override
+    public double calculateVelocity(String sprintTeamId) {
+        return calculateCapacity(sprintTeamId) * findOne(sprintTeamId).getVelocityFactor();
+    }
+
+    /**
      *  Removes duplicate entries from a list of SprintTeamPersons.
      *
      * @param members the list of SprintTeamPersons

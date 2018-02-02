@@ -46,4 +46,12 @@ public interface SprintTeamService {
      * @return the calculated capacity
      */
     double calculateCapacity(String sprintTeamId);
+
+    /**
+     *  Calculate the velocity for the SprintTeam with the given id
+     *
+     * @param sprintTeamId the id of the sprint team for which to calculate the velocity
+     * @return the calculated velocity
+     */
+    double calculateVelocity(String sprintTeamId);
 }
