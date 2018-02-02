@@ -22,11 +22,12 @@ import tum.sebis.apm.web.rest.errors.PersonNotFoundException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Service Implementation for managing SprintTeam.
@@ -85,7 +86,7 @@ public class SprintTeamServiceImpl implements SprintTeamService{
         sprintTeam.setTeam(team);
 
         if (sprintTeam.getSprintTeamPersons() == null) {
-            sprintTeam.setSprintTeamPersons(new ArrayList<>());
+            sprintTeam.setSprintTeamPersons(Collections.emptyList());
         } else {
             sprintTeam.setSprintTeamPersons(removeDuplicates(sprintTeam.getSprintTeamPersons()));
             checkSprintTeamMembers(sprintTeam.getSprintTeamPersons());
@@ -146,13 +147,10 @@ public class SprintTeamServiceImpl implements SprintTeamService{
     public double calculateCapacity(String sprintTeamId) {
         log.debug("Request to calculate capacity for SprintTeam : {}", sprintTeamId);
         double capacity = 0;
-        List<SprintTeamPerson> sprintTeamPersons = findOne(sprintTeamId).getSprintTeamPersons();
-        if (sprintTeamPersons != null) {
-            for (SprintTeamPerson sprintTeamPerson : sprintTeamPersons) {
-                Person person = personServiceClient.getPersonById(sprintTeamPerson.getPersonId());
-                capacity +=
-                    sprintTeamPerson.getAvailableDays().size() * person.getProjectAvailability() * person.getSprintAvailability();
-            }
+        for (SprintTeamPerson sprintTeamPerson : findOne(sprintTeamId).getSprintTeamPersons()) {
+            Person person = personServiceClient.getPersonById(sprintTeamPerson.getPersonId());
+            capacity +=
+                sprintTeamPerson.getAvailableDays().size() * person.getProjectAvailability() * person.getSprintAvailability();
         }
         return capacity;
     }
