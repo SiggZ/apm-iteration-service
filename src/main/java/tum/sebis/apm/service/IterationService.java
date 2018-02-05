@@ -2,6 +2,7 @@ package tum.sebis.apm.service;
 
 import tum.sebis.apm.domain.Iteration;
 import java.util.List;
+import java.time.LocalDate;
 
 /**
  * Service Interface for managing Iteration.
@@ -37,4 +38,11 @@ public interface IterationService {
      * @param id the id of the entity
      */
     void delete(String id);
+
+    /**
+     * Get all work days from start to end date for sprint.
+     *
+     * @return the list of dates
+     */
+    List<LocalDate> getListOfDaysForSprint(String sprintTeamId);
 }

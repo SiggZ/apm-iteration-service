@@ -6,14 +6,23 @@ import tum.sebis.apm.repository.IterationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+
 
 /**
  * Service Implementation for managing Iteration.
  */
 @Service
-public class IterationServiceImpl implements IterationService{
+public class IterationServiceImpl implements IterationService {
 
     private final Logger log = LoggerFactory.getLogger(IterationServiceImpl.class);
 
@@ -68,4 +77,30 @@ public class IterationServiceImpl implements IterationService{
         log.debug("Request to delete Iteration : {}", id);
         iterationRepository.delete(id);
     }
+
+    /**
+     * Generate a list of LocalDate between given startDate and endDate including weekends
+     *
+     * @param startDate
+     * @param endDate
+     * @return a list of LocalDate
+     */
+    private List<LocalDate> getListOfDays(LocalDate startDate, LocalDate endDate) {
+        List<LocalDate> listOfDays = new ArrayList<>();
+        for (LocalDate d = startDate; !d.isAfter(endDate); d = d.plusDays(1)) {
+                listOfDays.add(d);
+        }
+        return listOfDays;
+    }
+
+    @Override
+    public List<LocalDate> getListOfDaysForSprint(String sprintId) {
+        Iteration sprint = findOne(sprintId);
+        if (sprint != null) {
+            return getListOfDays(sprint.getStart(), sprint.getEnd());
+        } else {
+          return new ArrayList<LocalDate>();
+        }
+     }
+
 }

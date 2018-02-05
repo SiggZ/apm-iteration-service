@@ -17,6 +17,7 @@ import java.net.URISyntaxException;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate;
 
 /**
  * REST controller for managing Iteration.
@@ -117,5 +118,19 @@ public class IterationResource {
         log.debug("REST request to delete Iteration : {}", id);
         iterationService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id)).build();
+    }
+
+
+    /**
+     * GET  /iterations/:id/dayslist : gets the capacity for sprintTeam with given id.
+     *
+     * @param id the id of the iteration to retrieve the list of days for
+     * @return List of dates or an empty list.
+     */
+    @GetMapping("/iterations/{id}/dayslist")
+    @Timed
+    public List<LocalDate> getListOfDaysForSprint(@PathVariable String id) {
+        log.debug("REST request to get the available days in a sprint: {}", id);
+        return iterationService.getListOfDaysForSprint(id);
     }
 }
