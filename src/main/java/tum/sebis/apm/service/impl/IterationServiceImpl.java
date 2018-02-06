@@ -79,16 +79,20 @@ public class IterationServiceImpl implements IterationService {
     }
 
     /**
-     * Generate a list of LocalDate between given startDate and endDate including weekends
+     *  Generate a list of LocalDate between given startDate and endDate without weekends
      *
      * @param startDate
      * @param endDate
-     * @return a list of LocalDate
+     * @return a list of LocalDate without weekends
      */
-    private List<LocalDate> getListOfDays(LocalDate startDate, LocalDate endDate) {
+    private List<LocalDate> getListOfWeekdays(LocalDate startDate, LocalDate endDate) {
         List<LocalDate> listOfDays = new ArrayList<>();
+        Set<DayOfWeek> weekend = EnumSet.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
+
         for (LocalDate d = startDate; !d.isAfter(endDate); d = d.plusDays(1)) {
+            if (!weekend.contains(d.getDayOfWeek())) {
                 listOfDays.add(d);
+            }
         }
         return listOfDays;
     }
@@ -97,7 +101,7 @@ public class IterationServiceImpl implements IterationService {
     public List<LocalDate> getListOfDaysForSprint(String sprintId) {
         Iteration sprint = findOne(sprintId);
         if (sprint != null) {
-            return getListOfDays(sprint.getStart(), sprint.getEnd());
+            return getListOfWeekdays(sprint.getStart(), sprint.getEnd());
         } else {
           return new ArrayList<LocalDate>();
         }
