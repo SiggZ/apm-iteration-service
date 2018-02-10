@@ -1,6 +1,5 @@
 package tum.sebis.apm.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.HttpEntity;
@@ -9,8 +8,10 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestOperations;
 import tum.sebis.apm.security.SecurityUtils;
+import tum.sebis.apm.web.rest.errors.ServiceNotReachableException;
 
 import java.net.URI;
 import java.util.List;
@@ -22,23 +23,21 @@ public abstract class AbstractMicroserviceClient<E> {
     protected String serviceUrl;
     protected DiscoveryClient discoveryClient;
     protected RestOperations restTemplate;
-    protected ObjectMapper mapper;
 
     public AbstractMicroserviceClient(DiscoveryClient discoveryClient, RestOperations restTemplate, String serviceName) {
         this.discoveryClient = discoveryClient;
         this.restTemplate = restTemplate;
         this.serviceName = serviceName.toUpperCase();
-        this.serviceUrl = retrieveServiceUrl();
     }
 
     // add abstract methods that should be implemented by the subclasses here
 
     private String retrieveServiceUrl() {
         List<ServiceInstance> instanceList = discoveryClient.getInstances(serviceName);
-        if (instanceList != null && instanceList.size() > 0) {
-            return instanceList.get(0).getUri().toString();
+        if (instanceList == null || instanceList.size() < 1) {
+            throw new ServiceNotReachableException(serviceName);
         }
-        return null;
+        return instanceList.get(0).getUri().toString();
     }
 
     /**
@@ -48,6 +47,9 @@ public abstract class AbstractMicroserviceClient<E> {
      * @return a URL
      */
     protected String generateUrl(String path) {
+        if (serviceUrl == null) {
+            serviceUrl = retrieveServiceUrl();
+        }
         String url = serviceUrl + "/api/" + path;
         return url;
     }
@@ -83,6 +85,8 @@ public abstract class AbstractMicroserviceClient<E> {
             response = restTemplate.exchange(URI.create(url), method, requestEntity, responseType);
         } catch (HttpClientErrorException e) {
             response = ResponseEntity.status(e.getStatusCode()).build();
+        } catch (ResourceAccessException e) {
+            throw new ServiceNotReachableException(serviceName);
         }
         return response;
     }
