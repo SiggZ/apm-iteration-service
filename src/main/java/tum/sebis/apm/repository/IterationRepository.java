@@ -2,6 +2,8 @@ package tum.sebis.apm.repository;
 
 import tum.sebis.apm.domain.Iteration;
 import org.springframework.stereotype.Repository;
+import java.util.List;
+
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -11,5 +13,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 @SuppressWarnings("unused")
 @Repository
 public interface IterationRepository extends MongoRepository<Iteration, String> {
-
+        List<Iteration> findAllByOrderByStartDesc();
 }
