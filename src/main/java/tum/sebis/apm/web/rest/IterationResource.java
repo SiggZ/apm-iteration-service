@@ -1,23 +1,31 @@
 package tum.sebis.apm.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import tum.sebis.apm.domain.Iteration;
-import tum.sebis.apm.service.IterationService;
-import tum.sebis.apm.web.rest.errors.BadRequestAlertException;
-import tum.sebis.apm.web.rest.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import tum.sebis.apm.domain.Iteration;
+import tum.sebis.apm.service.IterationService;
+import tum.sebis.apm.service.SprintTeamService;
+import tum.sebis.apm.web.rest.errors.BadRequestAlertException;
+import tum.sebis.apm.web.rest.errors.SprintNotFoundException;
+import tum.sebis.apm.web.rest.util.HeaderUtil;
 
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
-
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.time.LocalDate;
 
 /**
  * REST controller for managing Iteration.
@@ -32,8 +40,11 @@ public class IterationResource {
 
     private final IterationService iterationService;
 
-    public IterationResource(IterationService iterationService) {
+    private final SprintTeamService sprintTeamService;
+
+    public IterationResource(IterationService iterationService, SprintTeamService sprintTeamService) {
         this.iterationService = iterationService;
+        this.sprintTeamService = sprintTeamService;
     }
 
     /**
@@ -107,7 +118,7 @@ public class IterationResource {
     }
 
     /**
-     * DELETE  /iterations/:id : delete the "id" iteration.
+     * DELETE  /iterations/:id : delete the "id" iteration and all its sprintTeams.
      *
      * @param id the id of the iteration to delete
      * @return the ResponseEntity with status 200 (OK)
@@ -116,6 +127,11 @@ public class IterationResource {
     @Timed
     public ResponseEntity<Void> deleteIteration(@PathVariable String id) {
         log.debug("REST request to delete Iteration : {}", id);
+        Iteration sprint = iterationService.findOne(id);
+        if (sprint == null){
+            throw new SprintNotFoundException();
+        }
+        sprintTeamService.deleteForSprint(sprint);
         iterationService.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id)).build();
     }

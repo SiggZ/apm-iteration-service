@@ -125,7 +125,18 @@ public class SprintTeamServiceImpl implements SprintTeamService{
     }
 
     /**
-     *  Delete the  sprintTeam by id.
+     *  Get all the sprintTeams of a given sprint.
+     *
+     *  @param sprint
+     *  @return the list of entities
+     */
+    @Override
+    public List<SprintTeam> findBySprint(Iteration sprint) {
+        return sprintTeamRepository.findBySprint(sprint);
+    }
+
+    /**
+     *  Delete the sprintTeam by id.
      *
      *  @param id the id of the entity
      */
@@ -134,6 +145,21 @@ public class SprintTeamServiceImpl implements SprintTeamService{
         log.debug("Request to delete SprintTeam : {}", id);
         if (findOne(id) != null) {
             sprintTeamRepository.delete(id);
+        }
+    }
+
+    /**
+     *  Delete all sprintTeams of a given sprint.
+     *
+     *  @param sprint the sprint
+     */
+    @Override
+    public void deleteForSprint(Iteration sprint) {
+        List<SprintTeam> sprintTeamsToDelete = findBySprint(sprint);
+        if (sprintTeamsToDelete != null) {
+            for (SprintTeam sprintTeam : sprintTeamsToDelete) {
+                delete(sprintTeam.getId());
+            }
         }
     }
 
