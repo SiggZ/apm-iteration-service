@@ -17,14 +17,14 @@ import java.net.URI;
 import java.util.List;
 
 @Component
-public abstract class AbstractMicroserviceClient<E> {
+abstract class AbstractMicroserviceClient<E> {
 
     private String serviceName;
-    protected String serviceUrl;
-    protected DiscoveryClient discoveryClient;
-    protected RestOperations restTemplate;
+    private String serviceUrl;
+    private DiscoveryClient discoveryClient;
+    private RestOperations restTemplate;
 
-    public AbstractMicroserviceClient(DiscoveryClient discoveryClient, RestOperations restTemplate, String serviceName) {
+    AbstractMicroserviceClient(DiscoveryClient discoveryClient, RestOperations restTemplate, String serviceName) {
         this.discoveryClient = discoveryClient;
         this.restTemplate = restTemplate;
         this.serviceName = serviceName.toUpperCase();
@@ -46,7 +46,7 @@ public abstract class AbstractMicroserviceClient<E> {
      * @param path the path to the resource
      * @return a URL
      */
-    protected String generateUrl(String path) {
+    private String generateUrl(String path) {
         if (serviceUrl == null) {
             serviceUrl = retrieveServiceUrl();
         }
@@ -61,7 +61,7 @@ public abstract class AbstractMicroserviceClient<E> {
      * @param id identifier for a specific resource
      * @return a URL to a specific resource
      */
-    protected String generateUrl(String path, String id) {
+    String generateUrl(String path, String id) {
         return generateUrl(path + "/" + id);
     }
 
@@ -75,7 +75,7 @@ public abstract class AbstractMicroserviceClient<E> {
      * @param responseType the type of the data in the response body
      * @return a response entity containing the response from the service and/or the according status code
      */
-    protected ResponseEntity<E> sendAuthorizedRequest(String url, HttpMethod method, E requestBody, Class<E> responseType) {
+    ResponseEntity<E> sendAuthorizedRequest(String url, HttpMethod method, E requestBody, Class<E> responseType) {
         HttpHeaders headers = new HttpHeaders();
         String jwt = SecurityUtils.getCurrentUserJWT();
         headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + jwt);
