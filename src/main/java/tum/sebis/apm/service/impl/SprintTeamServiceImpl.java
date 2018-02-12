@@ -152,7 +152,7 @@ public class SprintTeamServiceImpl implements SprintTeamService{
             capacity +=
                 sprintTeamPerson.getAvailableDays().size() * person.getProjectAvailability() * person.getSprintAvailability();
         }
-        return capacity;
+        return round(capacity, 2);
     }
 
     /**
@@ -163,7 +163,8 @@ public class SprintTeamServiceImpl implements SprintTeamService{
      */
     @Override
     public double calculateVelocity(String sprintTeamId) {
-        return calculateCapacity(sprintTeamId) * findOne(sprintTeamId).getVelocityFactor();
+        double velocity = calculateCapacity(sprintTeamId) * findOne(sprintTeamId).getVelocityFactor();
+        return round(velocity, 2);
     }
 
     /**
@@ -231,5 +232,21 @@ public class SprintTeamServiceImpl implements SprintTeamService{
             }
         }
         return listOfDays;
+    }
+
+    /**
+     *  Rounds a value to a given number of decimals
+     *
+     * @param value the value that should be rounded
+     * @param places the number of decimals
+     * @return the rounded value
+     */
+    private static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
     }
 }
