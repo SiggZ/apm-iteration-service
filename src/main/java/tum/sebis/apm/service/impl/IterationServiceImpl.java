@@ -52,7 +52,7 @@ public class IterationServiceImpl implements IterationService {
     @Override
     public List<Iteration> findAll() {
         log.debug("Request to get all Iterations");
-        return iterationRepository.findAll();
+        return iterationRepository.findAllByOrderByStartDesc();
     }
 
     /**
@@ -85,14 +85,11 @@ public class IterationServiceImpl implements IterationService {
      * @param endDate
      * @return a list of LocalDate without weekends
      */
-    private List<LocalDate> getListOfWeekdays(LocalDate startDate, LocalDate endDate) {
+    private List<LocalDate> getListOfAllDays(LocalDate startDate, LocalDate endDate) {
         List<LocalDate> listOfDays = new ArrayList<>();
-        Set<DayOfWeek> weekend = EnumSet.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
 
         for (LocalDate d = startDate; !d.isAfter(endDate); d = d.plusDays(1)) {
-            if (!weekend.contains(d.getDayOfWeek())) {
                 listOfDays.add(d);
-            }
         }
         return listOfDays;
     }
@@ -101,7 +98,7 @@ public class IterationServiceImpl implements IterationService {
     public List<LocalDate> getListOfDaysForSprint(String sprintId) {
         Iteration sprint = findOne(sprintId);
         if (sprint != null) {
-            return getListOfWeekdays(sprint.getStart(), sprint.getEnd());
+            return getListOfAllDays(sprint.getStart(), sprint.getEnd());
         } else {
           return new ArrayList<LocalDate>();
         }
