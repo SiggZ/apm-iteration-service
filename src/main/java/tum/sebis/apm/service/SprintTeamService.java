@@ -70,4 +70,11 @@ public interface SprintTeamService {
      * @return the calculated velocity
      */
     double calculateVelocity(String sprintTeamId);
+
+    /**
+     *  Update the available days of the members of all sprint teams in the given sprint
+     *
+     * @param sprint the sprint for which to update the available days
+     */
+    void updateAvailableDays(Iteration sprint);
 }
