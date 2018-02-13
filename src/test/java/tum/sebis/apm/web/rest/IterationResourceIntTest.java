@@ -5,6 +5,7 @@ import tum.sebis.apm.IterationServiceApp;
 import tum.sebis.apm.domain.Iteration;
 import tum.sebis.apm.repository.IterationRepository;
 import tum.sebis.apm.service.IterationService;
+import tum.sebis.apm.service.SprintTeamService;
 import tum.sebis.apm.web.rest.errors.ExceptionTranslator;
 
 import org.junit.Before;
@@ -55,6 +56,9 @@ public class IterationResourceIntTest {
     private IterationService iterationService;
 
     @Autowired
+    private SprintTeamService sprintTeamService;
+
+    @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
 
     @Autowired
@@ -70,7 +74,7 @@ public class IterationResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final IterationResource iterationResource = new IterationResource(iterationService);
+        final IterationResource iterationResource = new IterationResource(iterationService, sprintTeamService);
         this.restIterationMockMvc = MockMvcBuilders.standaloneSetup(iterationResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)

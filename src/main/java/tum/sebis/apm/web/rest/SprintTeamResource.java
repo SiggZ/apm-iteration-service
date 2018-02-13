@@ -8,6 +8,7 @@ import tum.sebis.apm.service.SprintTeamService;
 import tum.sebis.apm.service.IterationService;
 import tum.sebis.apm.repository.SprintTeamRepository;
 import tum.sebis.apm.web.rest.errors.BadRequestAlertException;
+import tum.sebis.apm.web.rest.errors.SprintNotFoundException;
 import tum.sebis.apm.web.rest.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
@@ -116,16 +117,20 @@ public class SprintTeamResource {
     }
 
     /**
-     * GET  /sprint-teams-by-sprint/:id : get all the sprint teams for a particular sprint.
+     * GET  /sprint-teams-by-sprint/:sprintId : get all the sprint teams for a particular sprint.
+     *
+     * @param sprintId the id of the sprint
+     * @return the list of sprint teams for the given sprint id
      */
-    @GetMapping("/sprint-teams-by-sprint/{id}")
+    @GetMapping("/sprint-teams-by-sprint/{sprintId}")
     @Timed
-    public List<SprintTeam> getSprintTeamsBySprint(@PathVariable String id) {
-        // Get the sprint for the corresponding ID
-        Iteration sprint = iterationService.findOne(id);
-        log.debug("REST request to get Sprint Teams by Sprint: {}", id);
-        List<SprintTeam> sprintTeams = sprintTeamRepository.findBySprint(sprint);
-        return sprintTeams;
+    public List<SprintTeam> getSprintTeamsBySprint(@PathVariable String sprintId) {
+        log.debug("REST request to get Sprint Teams by Sprint: {}", sprintId);
+        Iteration sprint = iterationService.findOne(sprintId);
+        if (sprint == null) {
+            throw new SprintNotFoundException();
+        }
+        return sprintTeamService.findBySprint(sprint);
     }
 
     /**
