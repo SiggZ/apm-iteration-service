@@ -194,6 +194,22 @@ public class SprintTeamServiceImpl implements SprintTeamService{
     }
 
     /**
+     *  Update the available days of the members of all sprint teams in the given sprint
+     *
+     * @param sprint the sprint for which to update the available days
+     */
+    @Override
+    public void updateAvailableDays(Iteration sprint) {
+       List<SprintTeam> sprintTeams = sprintTeamRepository.findBySprint(sprint);
+       if (sprintTeams != null) {
+           for (SprintTeam sprintTeam : sprintTeams) {
+               sprintTeam = calculateAvailableDays(sprintTeam);
+               save(sprintTeam);
+           }
+       }
+    }
+
+    /**
      *  Removes duplicate entries from a list of SprintTeamPersons.
      *
      * @param members the list of SprintTeamPersons
@@ -268,7 +284,9 @@ public class SprintTeamServiceImpl implements SprintTeamService{
      * @return the rounded value
      */
     private static double round(double value, int places) {
-        if (places < 0) throw new IllegalArgumentException();
+        if (places < 0) {
+            throw new IllegalArgumentException();
+        }
 
         long factor = (long) Math.pow(10, places);
         value = value * factor;

@@ -68,7 +68,7 @@ public class IterationResource {
     }
 
     /**
-     * PUT  /iterations : Updates an existing iteration.
+     * PUT  /iterations : Updates an existing iteration and also updates the available days of all people in the sprint.
      *
      * @param iteration the iteration to update
      * @return the ResponseEntity with status 200 (OK) and with body the updated iteration,
@@ -83,12 +83,26 @@ public class IterationResource {
         if (iteration.getId() == null) {
             return createIteration(iteration);
         }
-        // TODO: we have to update/recalculate the available days of the members of all sprint teams belonging to the updated sprint,
-        // if there are any (and if the dates changed)
+        Iteration sprintBeforeUpdate = iterationService.findOne(iteration.getId());
         Iteration result = iterationService.save(iteration);
+        if (sprintBeforeUpdate != null && datesChanged(sprintBeforeUpdate, result)) {
+            sprintTeamService.updateAvailableDays(result);
+        }
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, iteration.getId().toString()))
             .body(result);
+    }
+
+    /**
+     *  Determines if either one or both dates of a sprint changed after updating it
+     *
+     * @param beforeUpdate the sprint before the update
+     * @param afterUpdate the sprint after the update
+     * @return true, if at least one date changed, false otherwise
+     */
+    private boolean datesChanged(Iteration beforeUpdate, Iteration afterUpdate) {
+        return !beforeUpdate.getStart().equals(afterUpdate.getStart())
+            || !beforeUpdate.getEnd().equals(afterUpdate.getEnd());
     }
 
     /**
