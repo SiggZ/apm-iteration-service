@@ -132,7 +132,7 @@ public class SprintTeamServiceImpl implements SprintTeamService{
      */
     @Override
     public List<SprintTeam> findBySprint(Iteration sprint) {
-        return sprintTeamRepository.findBySprint(sprint);
+        return sprintTeamRepository.findBySprintOrderByTeam(sprint);
     }
 
     /**
