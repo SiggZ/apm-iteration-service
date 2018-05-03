@@ -136,6 +136,21 @@ public class SprintTeamServiceImpl implements SprintTeamService{
     }
 
     /**
+     *  Get all the sprintTeams of a given sprint.
+     *
+     *  @param sprint
+     *  @return the list of entities
+     */
+    @Override
+    public SprintTeam findBySprintAndTeam(Iteration sprint, Team team) {
+        return sprintTeamRepository.findBySprintAndTeam(sprint, team);
+    }
+
+
+
+
+
+    /**
      *  Delete the sprintTeam by id.
      *
      *  @param id the id of the entity

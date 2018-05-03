@@ -15,7 +15,7 @@ import java.util.List;
 @Repository
 public interface SprintTeamRepository extends MongoRepository<SprintTeam, String> {
 
-    List<SprintTeam> findBySprintAndTeam(Iteration sprint, Team team);
+    SprintTeam findBySprintAndTeam(Iteration sprint, Team team);
     List<SprintTeam> findBySprintOrderByTeam(Iteration sprint);
     List<SprintTeam> findBySprint(Iteration sprint);
     List<SprintTeam> findByTeam (Team team);

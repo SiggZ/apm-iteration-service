@@ -2,6 +2,7 @@ package tum.sebis.apm.service;
 
 import tum.sebis.apm.domain.Iteration;
 import tum.sebis.apm.domain.SprintTeam;
+import tum.sebis.apm.domain.Team;
 
 import java.util.List;
 
@@ -40,6 +41,16 @@ public interface SprintTeamService {
      *  @return the list of entities
      */
     List<SprintTeam> findBySprint(Iteration sprint);
+
+    /**
+     *  Get all the sprintTeams of a given sprint and team.
+     *
+     *  @param sprint
+     *  @return the list of entities
+     */
+     SprintTeam findBySprintAndTeam(Iteration sprint, Team team);
+
+
 
     /**
      *  Delete the "id" sprintTeam.

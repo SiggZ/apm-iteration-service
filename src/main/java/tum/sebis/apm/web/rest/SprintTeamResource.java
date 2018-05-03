@@ -4,11 +4,14 @@ import com.codahale.metrics.annotation.Timed;
 
 import tum.sebis.apm.domain.Iteration;
 import tum.sebis.apm.domain.SprintTeam;
+import tum.sebis.apm.domain.Team;
 import tum.sebis.apm.service.SprintTeamService;
 import tum.sebis.apm.service.IterationService;
+import tum.sebis.apm.service.TeamService;
 import tum.sebis.apm.repository.SprintTeamRepository;
 import tum.sebis.apm.web.rest.errors.BadRequestAlertException;
 import tum.sebis.apm.web.rest.errors.SprintNotFoundException;
+import tum.sebis.apm.web.rest.errors.TeamNotFoundException;
 import tum.sebis.apm.web.rest.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import org.slf4j.Logger;
@@ -38,11 +41,15 @@ public class SprintTeamResource {
 
     private final IterationService iterationService;
 
+    private final TeamService teamService;
+
+
     private final SprintTeamRepository sprintTeamRepository;
 
-    public SprintTeamResource(SprintTeamService sprintTeamService, IterationService iterationService, SprintTeamRepository sprintTeamRepository ) {
+    public SprintTeamResource(SprintTeamService sprintTeamService, IterationService iterationService, TeamService teamService, SprintTeamRepository sprintTeamRepository ) {
         this.sprintTeamService = sprintTeamService;
         this.iterationService = iterationService;
+        this.teamService = teamService;
         this.sprintTeamRepository = sprintTeamRepository;
     }
 
@@ -132,6 +139,29 @@ public class SprintTeamResource {
         }
         return sprintTeamService.findBySprint(sprint);
     }
+
+    /**
+     * GET  /sprint-by-sprint-and-team/:sprintId/:teamId : get all the sprint teams for a particular sprint.
+     *
+     * @param sprintId the id of the sprint
+     * @return the list of sprint teams for the given sprint id
+     */
+    @GetMapping("/sprint-by-sprint-and-team/{sprintId}/{teamId}")
+    @Timed
+    public SprintTeam getSprintTeamsBySprintAndTeam(@PathVariable String sprintId, @PathVariable String teamId) {
+        log.debug("REST request to get Sprint Teams by Sprint: {}", sprintId);
+        Iteration sprint = iterationService.findOne(sprintId);
+        Team team = teamService.findOne(teamId);
+
+        if (sprint == null) {
+            throw new SprintNotFoundException();
+        } else if (team == null) {
+           throw new TeamNotFoundException();
+        }
+        return sprintTeamService.findBySprintAndTeam(sprint, team);
+    }
+
+
 
     /**
      * DELETE  /sprint-teams/:id : delete the "id" sprintTeam.
